@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肆顾门数字文化（南通）有限公司</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/logo.png" alt="肆顾门 logo">
+                <span>肆顾门数字文化</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">首页</a></li>
+                <li><a href="news.html">行业资讯</a></li>
+                <li><a href="team.html">团队风采</a></li>
+                <li><a href="works.html">原创剧本馆</a></li>
+                <li><a href="submit.html" class="btn-submit">创作中心</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Banner轮播 -->
+    <section class="banner">
+        <div class="banner-slider">
+            <div class="banner-slide active">
+                <div class="banner-content">
+                    <h1>让声音更有温度</h1>
+                    <p>专业的配音制作、广播剧创作、有声书录制服务</p>
+                    <a href="works.html" class="btn-primary">查看作品</a>
+                </div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-content">
+                    <h1>原创剧本孵化</h1>
+                    <p>从创意到成品，一站式剧本创作服务</p>
+                    <a href="submit.html" class="btn-primary">上传作品</a>
+                </div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-content">
+                    <h1>AI赋能创作</h1>
+                    <p>智能辅助，让创作更高效</p>
+                    <a href="news.html" class="btn-primary">了解更多</a>
+                </div>
+            </div>
+        </div>
+        <div class="banner-controls">
+            <button class="banner-prev"><i class="fas fa-chevron-left"></i></button>
+            <div class="banner-dots"></div>
+            <button class="banner-next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </section>
+
+    <!-- 业务概述 -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title">核心业务</h2>
+            <p class="section-subtitle">专业从事有声内容创作与数字文化服务</p>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3>配音制作</h3>
+                    <p>专业的配音演员团队，提供广告配音、影视配音、有声书朗读等服务</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-theater-masks"></i>
+                    </div>
+                    <h3>广播剧创作</h3>
+                    <p>从剧本创作到后期制作，打造沉浸式听觉体验</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>有声书录制</h3>
+                    <p>专业录音棚设备，多声线演绎，让文字活起来</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>配乐/音效制作</h3>
+                    <p>原创配乐、音效设计，为影视、游戏、广告提供声音解决方案</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最新资讯预览 -->
+    <section class="news-preview">
+        <div class="container">
+            <h2 class="section-title">最新资讯</h2>
+            <p class="section-subtitle">AI自动抓取，每日更新行业动态</p>
+            <div class="news-grid" id="news-preview">
+                <!-- 动态加载3条最新资讯 -->
+                <div class="news-card loading">
+                    <div class="news-image"></div>
+                    <div class="news-content">
+                        <h3>加载中...</h3>
+                        <p class="news-date">--</p>
+                        <p class="news-summary">正在加载最新资讯...</p>
+                    </div>
+                </div>
+                <div class="news-card loading">
+                    <div class="news-image"></div>
+                    <div class="news-content">
+                        <h3>加载中...</h3>
+                        <p class="news-date">--</p>
+                        <p class="news-summary">正在加载最新资讯...</p>
+                    </div>
+                </div>
+                <div class="news-card loading">
+                    <div class="news-image"></div>
+                    <div class="news-content">
+                        <h3>加载中...</h3>
+                        <p class="news-date">--</p>
+                        <p class="news-summary">正在加载最新资讯...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="news.html" class="btn-secondary">查看更多资讯</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 精选作品展示 -->
+    <section class="works-preview">
+        <div class="container">
+            <h2 class="section-title">精选作品</h2>
+            <p class="section-subtitle">优秀原创剧本与声音作品展示</p>
+            <div class="works-grid" id="works-preview">
+                <!-- 动态加载3个精选作品 -->
+                <div class="work-card loading">
+                    <div class="work-cover"></div>
+                    <div class="work-info">
+                        <h3>加载中...</h3>
+                        <span class="work-type">--</span>
+                        <p class="work-summary">正在加载作品...</p>
+                    </div>
+                </div>
+                <div class="work-card loading">
+                    <div class="work-cover"></div>
+                    <div class="work-info">
+                        <h3>加载中...</h3>
+                        <span class="work-type">--</span>
+                        <p class="work-summary">正在加载作品...</p>
+                    </div>
+                </div>
+                <div class="work-card loading">
+                    <div class="work-cover"></div>
+                    <div class="work-info">
+                        <h3>加载中...</h3>
+                        <span class="work-type">--</span>
+                        <p class="work-summary">正在加载作品...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="works.html" class="btn-secondary">查看全部作品</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 团队风采预览 -->
+    <section class="team-preview">
+        <div class="container">
+            <h2 class="section-title">团队风采</h2>
+            <p class="section-subtitle">专业团队，用心创作每一部作品</p>
+            <div class="team-grid" id="team-preview">
+                <!-- 动态加载4个团队成员 -->
+                <div class="team-card loading">
+                    <div class="team-avatar"></div>
+                    <h3>加载中...</h3>
+                    <p class="team-position">--</p>
+                </div>
+                <div class="team-card loading">
+                    <div class="team-avatar"></div>
+                    <h3>加载中...</h3>
+                    <p class="team-position">--</p>
+                </div>
+                <div class="team-card loading">
+                    <div class="team-avatar"></div>
+                    <h3>加载中...</h3>
+                    <p class="team-position">--</p>
+                </div>
+                <div class="team-card loading">
+                    <div class="team-avatar"></div>
+                    <h3>加载中...</h3>
+                    <p class="team-position">--</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="team.html" class="btn-secondary">查看全部成员</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>肆顾门数字文化</h3>
+                    <p>专业从事有声内容创作、剧本孵化、配音培训</p>
+                    <p>地址：江苏省南通市</p>
+                    <p>电话：待添加</p>
+                    <p>邮箱：待添加</p>
+                </div>
+                <div class="footer-col">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="news.html">行业资讯</a></li>
+                        <li><a href="team.html">团队风采</a></li>
+                        <li><a href="works.html">原创剧本馆</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>创作服务</h3>
+                    <ul>
+                        <li><a href="submit.html">上传作品</a></li>
+                        <li><a href="#">配音制作</a></li>
+                        <li><a href="#">剧本创作</a></li>
+                        <li><a href="#">有声书录制</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>关注我们</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fas fa-podcast"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 肆顾门数字文化（南通）有限公司 版权所有</p>
+                <p>ICP备案：待添加</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

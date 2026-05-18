@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创作者中心 - 肆顾门数字文化</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 mammoth.js 用于解析 docx 文档 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        /* 文档预览区域样式 */
+        .doc-preview-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .doc-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .doc-preview-header h3 {
+            color: #333;
+            font-size: 18px;
+        }
+        .doc-preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-clear-doc {
+            background: #ff4d4f;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-clear-doc:hover {
+            background: #ff7875;
+        }
+        #doc-content {
+            min-height: 300px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 15px;
+            color: #333;
+        }
+        #doc-content h1, #doc-content h2, #doc-content h3 {
+            color: #1a1a3e;
+            margin: 1em 0 0.5em;
+        }
+        #doc-content h1 { font-size: 24px; color: #d4af37; }
+        #doc-content h2 { font-size: 20px; }
+        #doc-content h3 { font-size: 18px; }
+        #doc-content p {
+            margin: 0.8em 0;
+            text-indent: 2em;
+            color: #333;
+        }
+        #doc-content ul, #doc-content ol {
+            margin: 0.8em 0;
+            padding-left: 2em;
+            color: #333;
+        }
+        #doc-content li {
+            margin: 0.4em 0;
+            color: #333;
+        }
+        #doc-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1em 0;
+        }
+        #doc-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+        }
+        #doc-content td, #doc-content th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            color: #333;
+        }
+        #doc-content th {
+            background: #f5f5f5;
+        }
+        .doc-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .doc-placeholder i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        /* 简化后的表单样式 */
+        .simplified-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .upload-zone {
+            border: 2px dashed #d4af37;
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #fdf9f0 0%, #fff 100%);
+            transition: all 0.3s;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .upload-zone:hover {
+            border-color: #b8972e;
+            background: linear-gradient(135deg, #faf5e6 0%, #fff 100%);
+            transform: translateY(-2px);
+        }
+        .upload-zone.dragover {
+            border-color: #d4af37;
+            background: #fdf5e6;
+        }
+        .upload-zone i {
+            font-size: 50px;
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+        .upload-zone h3 {
+            color: #1a1a3e;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        .upload-zone p {
+            color: #444;
+            margin: 10px 0;
+            font-size: 15px;
+        }
+        .upload-zone .hint {
+            font-size: 13px;
+            color: #888;
+        }
+        .upload-zone:hover h3 {
+            color: #d4af37;
+        }
+        .file-input {
+            display: none;
+        }
+        .selected-file {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: #f0f9eb;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .selected-file i {
+            color: #67c23a;
+            font-size: 24px;
+        }
+        .selected-file .file-info {
+            flex: 1;
+        }
+        .selected-file .file-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .selected-file .file-size {
+            font-size: 13px;
+            color: #999;
+        }
+        .selected-file .remove-file {
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+        .selected-file .remove-file:hover {
+            color: #f56c6c;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .quick-action-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.15);
+        }
+        .quick-action-card i {
+            font-size: 32px;
+            color: #d4af37;
+            margin-bottom: 12px;
+        }
+        .quick-action-card h4 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .quick-action-card p {
+            color: #999;
+            font-size: 13px;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 40px 0 20px;
+            padding-left: 15px;
+            border-left: 4px solid #d4af37;
+        }
+        .section-title h2 {
+            font-size: 22px;
+            color: #1a1a3e;
+        }
+        .help-box {
+            background: linear-gradient(135deg, #fef9f3 0%, #fff 100%);
+            border: 1px solid #f5e6d3;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .help-box h4 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .help-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .help-box li {
+            padding: 8px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .help-box li i {
+            color: #67c23a;
+        }
+        /* 表单新增字段样式 */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .tag-group {
+            margin-top: 15px;
+        }
+        .tag-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .tag-checkbox {
+            display: none;
+        }
+        .tag-label {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #fff;
+            border: 2px solid #d4af37;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tag-checkbox:checked + .tag-label {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: #fff;
+            font-weight: 600;
+        }
+        .tag-label:hover {
+            background: #fdf5e6;
+            border-color: #b8972e;
+            color: #1a1a3e;
+        }
+        .tag-section {
+            margin-bottom: 20px;
+            padding: 18px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .tag-section h4 {
+            color: #1a1a3e;
+            font-size: 15px;
+            margin-bottom: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tag-section h4 i {
+            color: #d4af37;
+            font-size: 16px;
+        }
+        /* 音频上传样式 */
+        .audio-upload-zone {
+            border: 2px dashed #d4af37;
+            border-radius: 10px;
+            padding: 36px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fdfcf5;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .audio-upload-zone:hover {
+            border-color: #b8972e;
+            background: #fff8e1;
+            box-shadow: 0 4px 16px rgba(212,175,55,0.15);
+        }
+        .audio-upload-zone i.fa-cloud-upload-alt {
+            font-size: 40px;
+            color: #d4af37;
+            margin-bottom: 4px;
+        }
+        .audio-upload-zone p {
+            color: #333;
+            font-size: 15px;
+            font-weight: 500;
+            margin: 0;
+        }
+        .audio-upload-zone .hint {
+            color: #888;
+            font-size: 13px;
+            display: block;
+            margin-top: 4px;
+        }
+        .audio-upload-zone .file-input {
+            display: none;
+        }
+        .audio-list {
+            margin-top: 15px;
+        }
+        .audio-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f0f9eb;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .audio-item i {
+            color: #67c23a;
+            font-size: 20px;
+        }
+        .audio-item .audio-name {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        .audio-item .audio-size {
+            font-size: 12px;
+            color: #999;
+        }
+        .audio-item .audio-remove {
+            cursor: pointer;
+            color: #f56c6c;
+            font-size: 18px;
+        }
+        /* 投稿须知 */
+        .agreement-box {
+            background: #fffbf0;
+            border: 1px solid #f5e6d3;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .agreement-box h4 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+        .agreement-box p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        .agreement-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .agreement-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .agreement-checkbox label {
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .agreement-checkbox a {
+            color: #d4af37;
+            text-decoration: underline;
+        }
+        /* 提交按钮 */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn-draft {
+            flex: 1;
+            padding: 14px 24px;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-draft:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+        .btn-submit {
+            flex: 2;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8972e 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #e8c860 0%, #d4af37 100%);
+        }
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        /* 创作来源和转载权限行 */
+        .source-permission-row select {
+            appearance: auto;
+            -webkit-appearance: menulist;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #333;
+            background: #fff;
+            cursor: pointer;
+            min-height: 44px;
+        }
+        .source-permission-row select:focus {
+            border-color: #d4af37;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+        }
+        .source-permission-row select option {
+            font-size: 15px;
+            color: #333;
+            padding: 8px;
+        }
+        /* 封面预览 */
+        .cover-preview {
+            margin-top: 10px;
+        }
+        .cover-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #eee;
+        }
+        /* 图片格式提示 */
+        .format-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/logo.png" alt="肆顾门 logo">
+                <span>肆顾门数字文化</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="news.html">行业资讯</a></li>
+                <li><a href="team.html">团队风采</a></li>
+                <li><a href="works.html">原创剧本馆</a></li>
+                <li><a href="submit.html" class="active btn-submit">创作中心</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面标题 -->
+    <section class="page-header">
+        <div class="container">
+            <h1>创作者中心</h1>
+            <p>上传您的原创作品，经过审核后即可展示</p>
+        </div>
+    </section>
+
+    <!-- 用户状态 -->
+    <section class="user-status">
+        <div class="container">
+            <div id="login-section">
+                <div class="auth-box">
+                    <h2><i class="fas fa-user-circle"></i> 用户登录</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-username"><i class="fas fa-user"></i> 用户名</label>
+                            <input type="text" id="login-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password"><i class="fas fa-lock"></i> 密码</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-sign-in-alt"></i> 登录</button>
+                        <p class="auth-switch">还没有账号？<a href="#" id="show-register"><i class="fas fa-user-plus"></i> 立即注册</a></p>
+                    </form>
+                </div>
+            </div>
+            <div id="register-section" style="display: none;">
+                <div class="auth-box">
+                    <h2><i class="fas fa-user-plus"></i> 用户注册</h2>
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label for="register-username"><i class="fas fa-user"></i> 用户名</label>
+                            <input type="text" id="register-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email"><i class="fas fa-envelope"></i> 邮箱</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password"><i class="fas fa-lock"></i> 密码</label>
+                            <input type="password" id="register-password" required>
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> 注册</button>
+                        <p class="auth-switch">已有账号？<a href="#" id="show-login"><i class="fas fa-sign-in-alt"></i> 立即登录</a></p>
+                    </form>
+                </div>
+            </div>
+            <div id="user-panel" style="display: none;">
+                <div class="user-info">
+                    <h2><i class="fas fa-hand-wave"></i> 欢迎回来，<span id="current-username"></span>！</h2>
+                    <button id="logout-btn" class="btn-secondary"><i class="fas fa-sign-out-alt"></i> 退出登录</button>
+                </div>
+                <div class="user-actions">
+                    <a href="#upload-section" class="btn-primary"><i class="fas fa-cloud-upload-alt"></i> 上传新作品</a>
+                    <a href="#my-works" class="btn-secondary"><i class="fas fa-folder-open"></i> 我的作品</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .auth-box {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(26, 26, 62, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .auth-box h2 {
+            text-align: center;
+            color: var(--accent-color, #d4af37);
+            margin-bottom: 25px;
+        }
+        .auth-box h2 i {
+            color: #d4af37;
+            margin-right: 8px;
+        }
+        .auth-switch {
+            text-align: center;
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .auth-switch a {
+            color: var(--accent-color, #d4af37);
+            font-weight: 600;
+        }
+        .user-info {
+            text-align: center;
+            padding: 20px;
+            background: rgba(26, 26, 62, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .user-info h2 {
+            color: var(--accent-color, #d4af37);
+            margin-bottom: 15px;
+        }
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+    </style>
+
+    <!-- 主要内容区 -->
+    <section class="main-content">
+        <div class="container">
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <a href="#upload-section" class="quick-action-card">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h4>上传文档</h4>
+                    <p>支持多种格式自动转换</p>
+                </a>
+                <a href="#preview-section" class="quick-action-card">
+                    <i class="fas fa-eye"></i>
+                    <h4>预览效果</h4>
+                    <p>查看文档转换后的效果</p>
+                </a>
+                <a href="#submit-form" class="quick-action-card">
+                    <i class="fas fa-paper-plane"></i>
+                    <h4>提交审核</h4>
+                    <p>填写信息提交作品</p>
+                </a>
+                <a href="#my-works" class="quick-action-card">
+                    <i class="fas fa-folder-open"></i>
+                    <h4>我的作品</h4>
+                    <p>管理已上传的作品</p>
+                </a>
+            </div>
+
+            <!-- 上传文档区域 -->
+            <div class="section-title" id="upload-section">
+                <h2>上传文档</h2>
+            </div>
+
+            <div class="simplified-form">
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('doc-file').click();">
+                    <i class="fas fa-file-import"></i>
+                    <h3>点击或拖拽上传文档</h3>
+                    <p>支持 .doc / .docx / .pdf / 图片格式</p>
+                    <span class="hint">文档不超过 10MB，图片不超过 5MB</span>
+                    <input type="file" id="doc-file" class="file-input" accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.gif,.bmp,.webp" onchange="handleFileSelect(this.files[0])">
+                </div>
+
+                <!-- 已选择文件显示 -->
+                <div class="selected-file" id="selected-file" style="display: none;">
+                    <i class="fas fa-file-word" id="file-icon"></i>
+                    <div class="file-info">
+                        <div class="file-name" id="file-name"></div>
+                        <div class="file-size" id="file-size"></div>
+                    </div>
+                    <span class="remove-file" id="remove-file">
+                        <i class="fas fa-times-circle"></i>
+                    </span>
+                </div>
+
+                <button class="btn-primary" id="convert-btn" style="display: none; width: 100%; margin-top: 20px;">
+                    <i class="fas fa-magic"></i> 转换为可浏览格式
+                </button>
+
+                <!-- 帮助信息 -->
+                <div class="help-box">
+                    <h4><i class="fas fa-lightbulb"></i> 温馨提示</h4>
+                    <ul>
+                        <li><i class="fas fa-check"></i> 支持 Word 文档（.docx 效果最佳）、PDF、图片</li>
+                        <li><i class="fas fa-check"></i> 上传后系统会自动提取文档内容和图片</li>
+                        <li><i class="fas fa-check"></i> 预览满意后再填写提交信息</li>
+                        <li><i class="fas fa-check"></i> 图片文件将直接作为作品内容展示</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 文档预览区域 -->
+            <div class="section-title" id="preview-section">
+                <h2>文档预览</h2>
+            </div>
+
+            <div class="doc-preview-container">
+                <div class="doc-preview-header">
+                    <h3><i class="fas fa-file-alt"></i> <span id="preview-title">文档内容</span></h3>
+                    <div class="doc-preview-actions">
+                        <button class="btn-clear-doc" id="clear-preview">
+                            <i class="fas fa-trash-alt"></i> 清空
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 文档内容占位 -->
+                <div id="doc-content">
+                    <div class="doc-placeholder">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>尚未上传文档</h3>
+                        <p>请上传文档或图片文件</p>
+                        <p>内容将在此处显示</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提交表单 -->
+            <div class="section-title" id="submit-form">
+                <h2>作品信息</h2>
+            </div>
+
+            <div class="simplified-form">
+                <form id="simple-upload-form">
+                    <!-- 基本信息 -->
+                    <div class="form-group">
+                        <label for="work-title">作品标题 *</label>
+                        <input type="text" id="work-title" required placeholder="请输入作品标题">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="work-type"><i class="fas fa-theater-masks" style="color:#d4af37;margin-right:6px;"></i>作品类型 *</label>
+                            <select id="work-type" required style="font-size:15px;color:#333;background:#fff;">
+                                <option value="">请选择类型</option>
+                                <option value="drama">广播剧</option>
+                                <option value="audiobook">有声书</option>
+                                <option value="shortplay">短剧</option>
+                                <option value="pia">PIA剧</option>
+                            </select>
+                        </div>
+                    <div class="form-group">
+                        <label for="work-language"><i class="fas fa-language" style="color:#d4af37;margin-right:6px;"></i>语言 *</label>
+                        <select id="work-language" required style="font-size:15px;color:#333;background:#fff;">
+                            <option value="">请选择语言</option>
+                            <option value="汉语">汉语</option>
+                            <option value="英语">英语</option>
+                            <option value="日语">日语</option>
+                            <option value="互译">互译</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <!-- 剧本标签 -->
+                    <div class="form-group tag-group">
+                        <label>剧本标签（可多选）</label>
+
+                        <div class="tag-section">
+                            <h4><i class="fas fa-palette"></i> 风格基调</h4>
+                            <div class="tag-options">
+                                <input type="checkbox" id="tag-热血" value="热血" class="tag-checkbox" name="tags">
+                                <label for="tag-热血" class="tag-label">热血</label>
+                                <input type="checkbox" id="tag-治愈" value="治愈" class="tag-checkbox" name="tags">
+                                <label for="tag-治愈" class="tag-label">治愈</label>
+                                <input type="checkbox" id="tag-虐心" value="虐心" class="tag-checkbox" name="tags">
+                                <label for="tag-虐心" class="tag-label">虐心</label>
+                                <input type="checkbox" id="tag-搞笑" value="搞笑" class="tag-checkbox" name="tags">
+                                <label for="tag-搞笑" class="tag-label">搞笑</label>
+                                <input type="checkbox" id="tag-悬疑" value="悬疑" class="tag-checkbox" name="tags">
+                                <label for="tag-悬疑" class="tag-label">悬疑</label>
+                                <input type="checkbox" id="tag-甜宠" value="甜宠" class="tag-checkbox" name="tags">
+                                <label for="tag-甜宠" class="tag-label">甜宠</label>
+                                <input type="checkbox" id="tag-虐恋" value="虐恋" class="tag-checkbox" name="tags">
+                                <label for="tag-虐恋" class="tag-label">虐恋</label>
+                            </div>
+                        </div>
+
+                        <div class="tag-section">
+                            <h4><i class="fas fa-book"></i> 主题</h4>
+                            <div class="tag-options">
+                                <input type="checkbox" id="tag-爱情" value="爱情" class="tag-checkbox" name="tags">
+                                <label for="tag-爱情" class="tag-label">爱情</label>
+                                <input type="checkbox" id="tag-友情" value="友情" class="tag-checkbox" name="tags">
+                                <label for="tag-友情" class="tag-label">友情</label>
+                                <input type="checkbox" id="tag-亲情" value="亲情" class="tag-checkbox" name="tags">
+                                <label for="tag-亲情" class="tag-label">亲情</label>
+                                <input type="checkbox" id="tag-成长" value="成长" class="tag-checkbox" name="tags">
+                                <label for="tag-成长" class="tag-label">成长</label>
+                                <input type="checkbox" id="tag-复仇" value="复仇" class="tag-checkbox" name="tags">
+                                <label for="tag-复仇" class="tag-label">复仇</label>
+                                <input type="checkbox" id="tag-逆袭" value="逆袭" class="tag-checkbox" name="tags">
+                                <label for="tag-逆袭" class="tag-label">逆袭</label>
+                                <input type="checkbox" id="tag-救赎" value="救赎" class="tag-checkbox" name="tags">
+                                <label for="tag-救赎" class="tag-label">救赎</label>
+                            </div>
+                        </div>
+
+                        <div class="tag-section">
+                            <h4><i class="fas fa-film"></i> 题材</h4>
+                            <div class="tag-options">
+                                <input type="checkbox" id="tag-都市" value="都市" class="tag-checkbox" name="tags">
+                                <label for="tag-都市" class="tag-label">都市</label>
+                                <input type="checkbox" id="tag-校园" value="校园" class="tag-checkbox" name="tags">
+                                <label for="tag-校园" class="tag-label">校园</label>
+                                <input type="checkbox" id="tag-古风" value="古风" class="tag-checkbox" name="tags">
+                                <label for="tag-古风" class="tag-label">古风</label>
+                                <input type="checkbox" id="tag-奇幻" value="奇幻" class="tag-checkbox" name="tags">
+                                <label for="tag-奇幻" class="tag-label">奇幻</label>
+                                <input type="checkbox" id="tag-悬疑破案" value="悬疑破案" class="tag-checkbox" name="tags">
+                                <label for="tag-悬疑破案" class="tag-label">悬疑破案</label>
+                                <input type="checkbox" id="tag-穿越" value="穿越" class="tag-checkbox" name="tags">
+                                <label for="tag-穿越" class="tag-label">穿越</label>
+                                <input type="checkbox" id="tag-电竞" value="电竞" class="tag-checkbox" name="tags">
+                                <label for="tag-电竞" class="tag-label">电竞</label>
+                            </div>
+                        </div>
+
+                        <div class="tag-section">
+                            <h4><i class="fas fa-clock"></i> 时代背景</h4>
+                            <div class="tag-options">
+                                <input type="checkbox" id="tag-现代" value="现代" class="tag-checkbox" name="tags">
+                                <label for="tag-现代" class="tag-label">现代</label>
+                                <input type="checkbox" id="tag-近代" value="近代" class="tag-checkbox" name="tags">
+                                <label for="tag-近代" class="tag-label">近代</label>
+                                <input type="checkbox" id="tag-古代" value="古代" class="tag-checkbox" name="tags">
+                                <label for="tag-古代" class="tag-label">古代</label>
+                                <input type="checkbox" id="tag-未来" value="未来" class="tag-checkbox" name="tags">
+                                <label for="tag-未来" class="tag-label">未来</label>
+                                <input type="checkbox" id="tag-架空" value="架空" class="tag-checkbox" name="tags">
+                                <label for="tag-架空" class="tag-label">架空</label>
+                                <input type="checkbox" id="tag-末世" value="末世" class="tag-checkbox" name="tags">
+                                <label for="tag-末世" class="tag-label">末世</label>
+                            </div>
+                        </div>
+
+                        <div class="tag-section">
+                            <h4><i class="fas fa-code-branch"></i> 衍生来源</h4>
+                            <div class="tag-options">
+                                <input type="checkbox" id="tag-小说改编" value="小说改编" class="tag-checkbox" name="tags">
+                                <label for="tag-小说改编" class="tag-label">小说改编</label>
+                                <input type="checkbox" id="tag-动漫改编" value="动漫改编" class="tag-checkbox" name="tags">
+                                <label for="tag-动漫改编" class="tag-label">动漫改编</label>
+                                <input type="checkbox" id="tag-游戏改编" value="游戏改编" class="tag-checkbox" name="tags">
+                                <label for="tag-游戏改编" class="tag-label">游戏改编</label>
+                                <input type="checkbox" id="tag-影视改编" value="影视改编" class="tag-checkbox" name="tags">
+                                <label for="tag-影视改编" class="tag-label">影视改编</label>
+                                <input type="checkbox" id="tag-原创" value="原创" class="tag-checkbox" name="tags">
+                                <label for="tag-原创" class="tag-label">原创</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="work-summary">作品简介 *</label>
+                        <textarea id="work-summary" rows="4" required placeholder="简短介绍您的作品..."></textarea>
+                    </div>
+
+                    <!-- 作品封面 -->
+                    <div class="form-group">
+                        <label for="work-cover">作品封面 *</label>
+                        <input type="file" id="work-cover" accept="image/*" required>
+                        <p class="format-hint">支持 jpg、png、gif 等图片格式</p>
+                        <div class="cover-preview" id="cover-preview"></div>
+                    </div>
+
+                    <!-- 创作来源与转载权限 -->
+                    <div class="form-row source-permission-row">
+                        <div class="form-group">
+                            <label for="work-source"><i class="fas fa-pen-nib" style="color:#d4af37;margin-right:6px;"></i>创作来源 *</label>
+                            <select id="work-source" required style="font-size:15px;color:#333;background:#fff;">
+                                <option value="">请选择来源</option>
+                                <option value="原创作品">原创作品</option>
+                                <option value="二次创作">二次创作</option>
+                                <option value="转载作品">转载作品</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="work-reprint"><i class="fas fa-share-alt" style="color:#d4af37;margin-right:6px;"></i>转载权限 *</label>
+                            <select id="work-reprint" required style="font-size:15px;color:#333;background:#fff;">
+                                <option value="">请选择权限</option>
+                                <option value="禁止转载">禁止转载</option>
+                                <option value="注明出处转载">注明出处转载</option>
+                                <option value="联系作者">联系作者</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 音频文件上传 -->
+                    <div class="form-group">
+                        <label><i class="fas fa-music"></i> 上传后期文件（可选）</label>
+                        <div class="audio-upload-zone" id="audio-upload-zone" onclick="document.getElementById('audio-file').click();">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>点击上传音频文件</p>
+                            <span class="hint">支持 mp3、wav 格式，单个文件不超过 100MB</span>
+                            <input type="file" id="audio-file" class="file-input" accept=".mp3,.wav" multiple onchange="handleAudioSelect(Array.from(this.files))">
+                        </div>
+                        <div class="audio-list" id="audio-list"></div>
+                    </div>
+
+                    <!-- 隐藏字段存储转换后的HTML内容 -->
+                    <input type="hidden" id="work-content-html" value="">
+                    <input type="hidden" id="work-draft-status" value="draft">
+
+                    <!-- 进度条 -->
+                    <div class="upload-progress" id="upload-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p class="progress-text" id="progress-text">上传中...</p>
+                    </div>
+
+                    <!-- 投稿须知 -->
+                    <div class="agreement-box">
+                        <h4><i class="fas fa-scroll"></i> 投稿须知</h4>
+                        <p>1. 投稿作品必须为原创或已获得授权的内容，不得侵犯他人知识产权；<br>
+                        2. 投稿即表示同意《作品规范指引》的全部条款；<br>
+                        3. 编辑有权对作品进行适当修改以符合平台规范；<br>
+                        4. 作品一旦采用，作者保留署名权，其他权益归平台所有。</p>
+                        <div class="agreement-checkbox">
+                            <input type="checkbox" id="agree-terms" required>
+                            <label for="agree-terms">我已阅读并接受《<a href="#" onclick="alert('作品规范指引详情'); return false;">作品规范指引</a>》</label>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-draft" id="btn-draft">
+                            <i class="fas fa-save"></i> 保存草稿
+                        </button>
+                        <button type="submit" class="btn-submit" id="btn-submit">
+                            <i class="fas fa-paper-plane"></i> 提交审核
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 我的作品 -->
+            <div class="section-title" id="my-works">
+                <h2>我的作品</h2>
+            </div>
+
+            <div class="works-grid" id="my-works-container">
+                <p class="no-works">暂无作品，快来上传吧！</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>肆顾门数字文化</h3>
+                    <p>专业从事有声内容创作、剧本孵化、配音培训</p>
+                </div>
+                <div class="footer-col">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="news.html">行业资讯</a></li>
+                        <li><a href="team.html">团队风采</a></li>
+                        <li><a href="works.html">原创剧本馆</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>创作服务</h3>
+                    <ul>
+                        <li><a href="submit.html">上传作品</a></li>
+                        <li><a href="#">配音制作</a></li>
+                        <li><a href="#">剧本创作</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>关注我们</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 肆顾门数字文化（南通）有限公司</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // 初始化 PDF.js（如果已加载）
+        if (typeof pdfjsLib !== 'undefined') {
+            try {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            } catch(e) { console.log('PDF.js init skipped'); }
+        }
+
+        // 全局变量
+        var currentFile = null;
+        var convertedHtml = '';
+        var audioFiles = [];
+
+        // 支持的文件类型
+        var validDocTypes = [
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/msword',
+            'application/pdf'
+        ];
+        var validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // 获取文件图标
+        function getFileIcon(type, name) {
+            if (name.match(/\.docx?$/i)) return 'fa-file-word';
+            if (name.match(/\.pdf$/i)) return 'fa-file-pdf';
+            if (validImageTypes.includes(type)) return 'fa-file-image';
+            return 'fa-file';
+        }
+
+        // 处理文件选择
+        function handleFileSelect(file) {
+            if (!file) return;
+            
+            var fileNameLower = file.name.toLowerCase();
+            var isDoc = validDocTypes.includes(file.type) || fileNameLower.match(/\.(doc|docx|pdf)$/);
+            var isImage = validImageTypes.includes(file.type) || fileNameLower.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/);
+
+            if (!isDoc && !isImage) {
+                alert('请上传文档（.doc/.docx/.pdf）或图片文件！');
+                return;
+            }
+
+            // 检查文件大小
+            var maxSize = isImage ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('文件大小不能超过 ' + (isImage ? '5MB' : '10MB'));
+                return;
+            }
+
+            currentFile = file;
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            document.getElementById('file-icon').className = 'fas ' + getFileIcon(file.type, file.name);
+
+            document.getElementById('upload-zone').style.display = 'none';
+            document.getElementById('selected-file').style.display = 'flex';
+
+            var docContent = document.getElementById('doc-content');
+            var convertBtn = document.getElementById('convert-btn');
+            var previewTitle = document.getElementById('preview-title');
+
+            // 图片直接显示，文档需要转换
+            if (isImage) {
+                convertBtn.style.display = 'none';
+                previewTitle.textContent = file.name;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    convertedHtml = '<img src="' + e.target.result + '" alt="' + file.name + '">';
+                    docContent.innerHTML = '<img src="' + e.target.result + '" style="max-width:100%;border-radius:8px;">';
+                    document.getElementById('work-content-html').value = convertedHtml;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                convertBtn.style.display = 'block';
+                previewTitle.textContent = file.name.replace(/\.(doc|docx|pdf)$/i, '');
+            }
+        }
+
+        // 处理音频文件
+        function handleAudioSelect(files) {
+            if (!files || files.length === 0) return;
+            
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                if (file.size > 100 * 1024 * 1024) {
+                    alert('文件 ' + file.name + ' 超过 100MB 限制');
+                    continue;
+                }
+                audioFiles.push(file);
+            }
+            renderAudioList();
+        }
+
+        // 渲染音频列表
+        function renderAudioList() {
+            var html = '';
+            for (var i = 0; i < audioFiles.length; i++) {
+                var file = audioFiles[i];
+                html += '<div class="audio-item">' +
+                    '<i class="fas fa-music"></i>' +
+                    '<span class="audio-name">' + file.name + '</span>' +
+                    '<span class="audio-size">' + formatFileSize(file.size) + '</span>' +
+                    '<i class="fas fa-times audio-remove" onclick="event.stopPropagation(); removeAudio(' + i + ')"></i>' +
+                    '</div>';
+            }
+            document.getElementById('audio-list').innerHTML = html;
+        }
+
+        // 删除音频
+        function removeAudio(index) {
+            audioFiles.splice(index, 1);
+            renderAudioList();
+        }
+
+        // 移除文件
+        function removeFile() {
+            currentFile = null;
+            convertedHtml = '';
+            document.getElementById('doc-file').value = '';
+            document.getElementById('upload-zone').style.display = 'block';
+            document.getElementById('selected-file').style.display = 'none';
+            document.getElementById('convert-btn').style.display = 'none';
+            document.getElementById('doc-content').innerHTML = '<div class="doc-placeholder"><i class="fas fa-file-alt"></i><h3>尚未上传文档</h3><p>请上传文档或图片文件</p><p>内容将在此处显示</p></div>';
+            document.getElementById('preview-title').textContent = '文档内容';
+            document.getElementById('work-content-html').value = '';
+        }
+
+        // 转换文档
+        async function convertDocument() {
+            if (!currentFile) return;
+
+            var convertBtn = document.getElementById('convert-btn');
+            var docContent = document.getElementById('doc-content');
+            var btnText = convertBtn.innerHTML;
+            convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 转换中...';
+            convertBtn.disabled = true;
+
+            try {
+                var fileName = currentFile.name.toLowerCase();
+
+                if (fileName.endsWith('.docx') || currentFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                    var arrayBuffer = await currentFile.arrayBuffer();
+                    var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    convertedHtml = result.value;
+                } else if (fileName.endsWith('.doc')) {
+                    // .doc 格式尝试转换，如果失败则提示用户
+                    try {
+                        var arrayBuffer = await currentFile.arrayBuffer();
+                        var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                        convertedHtml = result.value;
+                        if (!convertedHtml || convertedHtml.trim() === '') {
+                            throw new Error('Empty result');
+                        }
+                    } catch(e) {
+                        // 转换失败，提示用户使用更优格式
+                        alert('提示：.doc 格式兼容性较差，建议您用 Word 打开文档后，另存为 .docx 格式再上传，转换效果会更好。');
+                        convertedHtml = '<div style="padding:20px;text-align:center;color:#d4af37;"><i class="fas fa-exclamation-triangle" style="font-size:24px;"></i><p style="margin-top:10px;">此文档格式(.doc)较旧，建议另存为 .docx 后重新上传以获得最佳显示效果</p></div>';
+                        docContent.innerHTML = convertedHtml;
+                        document.getElementById('work-content-html').value = convertedHtml;
+                        return;
+                    }
+                } else if (fileName.endsWith('.pdf') || currentFile.type === 'application/pdf') {
+                    // PDF 转换
+                    if (typeof pdfjsLib !== 'undefined') {
+                        var arrayBuffer = await currentFile.arrayBuffer();
+                        var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        convertedHtml = '<div style="font-family: sans-serif;">';
+                        for (var i = 1; i <= Math.min(pdf.numPages, 50); i++) {
+                            var page = await pdf.getPage(i);
+                            var viewport = page.getViewport({ scale: 1.5 });
+                            var canvas = document.createElement('canvas');
+                            var context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            await page.render({ canvasContext: context, viewport: viewport }).promise;
+                            convertedHtml += '<div style="margin-bottom: 20px;"><img src="' + canvas.toDataURL() + '" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;"></div>';
+                        }
+                        convertedHtml += '</div>';
+                    } else {
+                        alert('PDF.js 未加载，无法转换 PDF 文件');
+                        convertedHtml = '';
+                    }
+                }
+
+                if (convertedHtml) {
+                    docContent.innerHTML = convertedHtml;
+                    document.getElementById('work-content-html').value = convertedHtml;
+                    alert('文档转换成功！请预览内容，确认无误后再提交。');
+                }
+            } catch (error) {
+                console.error('转换失败:', error);
+                alert('文档转换失败，请尝试其他文档或联系管理员。');
+            }
+
+            convertBtn.innerHTML = btnText;
+            convertBtn.disabled = false;
+        }
+
+        // 页面加载完成后初始化事件
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定移除文件按钮
+            document.getElementById('remove-file').addEventListener('click', removeFile);
+
+            // 绑定转换按钮
+            document.getElementById('convert-btn').addEventListener('click', convertDocument);
+
+            // 绑定清空按钮
+            document.getElementById('clear-preview').addEventListener('click', function() {
+                if (confirm('确定要清空预览吗？')) {
+                    removeFile();
+                }
+            });
+
+            // 绑定封面预览
+            var coverInput = document.getElementById('work-cover');
+            if (coverInput) {
+                coverInput.addEventListener('change', function(e) {
+                    var preview = document.getElementById('cover-preview');
+                    if (preview && e.target.files && e.target.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function(ev) {
+                            preview.innerHTML = '<img src="' + ev.target.result + '">';
+                        };
+                        reader.readAsDataURL(e.target.files[0]);
+                    }
+                });
+            }
+
+            // 绑定表单提交
+            var uploadForm = document.getElementById('simple-upload-form');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    if (!document.getElementById('agree-terms').checked) {
+                        alert('请阅读并接受《作品规范指引》');
+                        return;
+                    }
+                    await submitWork('pending');
+                });
+            }
+
+            // 绑定保存草稿按钮
+            var btnDraft = document.getElementById('btn-draft');
+            if (btnDraft) {
+                btnDraft.addEventListener('click', function() {
+                    submitWork('draft');
+                });
+            }
+
+            // 检查登录状态并加载我的作品
+            checkLoginAndLoadWorks();
+        });
+
+        // 检查登录并加载我的作品
+        async function checkLoginAndLoadWorks() {
+            var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            var userId = localStorage.getItem('userId');
+
+            if (isLoggedIn && userId) {
+                loadMyWorks();
+                checkNotifications();
+            }
+        }
+
+        // 加载我的作品
+        async function loadMyWorks() {
+            var userId = localStorage.getItem('userId');
+            if (!userId) return;
+
+            var container = document.getElementById('my-works-container');
+            container.innerHTML = '<p class="no-works" style="text-align:center;padding:40px;color:#999;">加载中...</p>';
+
+            try {
+                var res = await fetch('http://localhost:3000/api/works?userId=' + userId);
+                var data = await res.json();
+
+                if (data.success && data.data.length > 0) {
+                    renderMyWorks(data.data);
+                } else {
+                    container.innerHTML = '<p class="no-works" style="text-align:center;padding:40px;color:#999;">暂无作品，快来上传吧！</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p class="no-works" style="text-align:center;padding:40px;color:#999;">加载失败，请刷新重试</p>';
+            }
+        }
+
+        // 渲染我的作品列表
+        function renderMyWorks(works) {
+            var container = document.getElementById('my-works-container');
+            var statusMap = {
+                draft: { text: '草稿', class: 'draft', icon: 'fa-edit' },
+                pending: { text: '待审核', class: 'pending', icon: 'fa-clock' },
+                approved: { text: '已通过', class: 'approved', icon: 'fa-check-circle' },
+                rejected: { text: '未通过', class: 'rejected', icon: 'fa-times-circle' }
+            };
+
+            var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding:20px 0;">';
+
+            works.forEach(function(work) {
+                var status = statusMap[work.status] || statusMap.draft;
+                var submittedAt = work.submittedAt ? new Date(work.submittedAt).toLocaleDateString('zh-CN') : '-';
+
+                html += '<div class="work-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">';
+                html += '<div style="height:150px;background:linear-gradient(135deg,#1a1a3e 0%,#2d2d5a 100%);display:flex;align-items:center;justify-content:center;">';
+                if (work.cover) {
+                    html += '<img src="' + work.cover + '" style="max-width:100%;max-height:100%;object-fit:cover;">';
+                } else {
+                    html += '<i class="fas fa-file-alt" style="font-size:48px;color:rgba(255,255,255,0.3);"></i>';
+                }
+                html += '</div>';
+                html += '<div style="padding:16px;">';
+                html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">';
+                html += '<h4 style="margin:0;font-size:16px;color:#1a1a3e;flex:1;margin-right:10px;">' + work.title + '</h4>';
+                html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:12px;background:#f0f0f0;color:#666;">';
+                html += '<i class="fas ' + status.icon + '"></i> ' + status.text;
+                html += '</span>';
+                html += '</div>';
+                html += '<p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + (work.summary || '暂无简介') + '</p>';
+                html += '<p style="margin:0 0 12px;font-size:12px;color:#999;">提交时间：' + submittedAt + '</p>';
+
+                // 如果被拒绝，显示拒绝原因
+                if (work.status === 'rejected' && work.rejectionReason) {
+                    html += '<div style="background:#fff5f5;border:1px solid #ffcccc;border-radius:6px;padding:10px;margin-bottom:12px;">';
+                    html += '<p style="margin:0 0 6px;font-size:12px;color:#e74c3c;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> 审核未通过原因：</p>';
+                    html += '<p style="margin:0;font-size:13px;color:#666;line-height:1.5;">' + work.rejectionReason + '</p>';
+                    html += '</div>';
+                }
+
+                // 操作按钮
+                html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+                if (work.status === 'rejected') {
+                    // 被拒绝的作品可以重新编辑提交
+                    html += '<button onclick="editWork(\'' + work.id + '\')" style="flex:1;padding:8px 12px;background:#fff;border:1px solid #d4af37;border-radius:6px;color:#d4af37;font-size:13px;cursor:pointer;">';
+                    html += '<i class="fas fa-edit"></i> 修改重提';
+                    html += '</button>';
+                } else if (work.status === 'pending') {
+                    html += '<button disabled style="flex:1;padding:8px 12px;background:#f5f5f5;border:1px solid #ddd;border-radius:6px;color:#999;font-size:13px;cursor:not-allowed;">';
+                    html += '<i class="fas fa-clock"></i> 审核中';
+                    html += '</button>';
+                } else if (work.status === 'approved') {
+                    html += '<button disabled style="flex:1;padding:8px 12px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;color:#27ae60;font-size:13px;cursor:not-allowed;">';
+                    html += '<i class="fas fa-check"></i> 已上线';
+                    html += '</button>';
+                } else {
+                    html += '<button onclick="editWork(\'' + work.id + '\')" style="flex:1;padding:8px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#666;font-size:13px;cursor:pointer;">';
+                    html += '<i class="fas fa-edit"></i> 编辑';
+                    html += '</button>';
+                }
+                html += '<button onclick="deleteMyWork(\'' + work.id + '\')" style="padding:8px 12px;background:#fff;border:1px solid #ffcccc;border-radius:6px;color:#e74c3c;font-size:13px;cursor:pointer;">';
+                html += '<i class="fas fa-trash"></i>';
+                html += '</button>';
+                html += '</div>';
+                html += '</div></div>';
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // 编辑作品（用于被拒绝后重新提交）
+        async function editWork(workId) {
+            try {
+                var res = await fetch('http://localhost:3000/api/works/' + workId);
+                var data = await res.json();
+
+                if (data.success) {
+                    var work = data.data;
+
+                    // 填充表单
+                    document.getElementById('work-title').value = work.title;
+                    document.getElementById('work-summary').value = work.summary || '';
+                    document.getElementById('work-source').value = work.source || '';
+                    document.getElementById('work-reprint').value = work.reprint || '';
+
+                    // 设置类型
+                    var typeMap = { '剧本': 'drama', '有声书': 'audiobook', '短剧': 'shortplay', 'PIA剧': 'pia' };
+                    document.getElementById('work-type').value = typeMap[work.type] || 'drama';
+
+                    // 设置语言
+                    document.getElementById('work-language').value = work.language || '';
+
+                    // 设置标签
+                    if (work.tags) {
+                        work.tags.split(',').forEach(function(tag) {
+                            var checkbox = document.querySelector('input[name="tags"][value="' + tag.trim() + '"]');
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    }
+
+                    // 加载内容
+                    convertedHtml = work.content || work.contentHtml || '';
+                    document.getElementById('work-content-html').value = convertedHtml;
+                    if (convertedHtml) {
+                        document.getElementById('doc-content').innerHTML = convertedHtml;
+                        document.getElementById('preview-title').textContent = work.title;
+                    }
+
+                    // 保存当前编辑的workId到表单
+                    document.getElementById('simple-upload-form').dataset.editId = workId;
+
+                    // 滚动到上传区域
+                    document.querySelector('#submit-form').scrollIntoView({ behavior: 'smooth' });
+
+                    alert('已加载作品信息，请修改后重新提交审核');
+                }
+            } catch (err) {
+                alert('加载失败');
+            }
+        }
+
+        // 删除我的作品
+        async function deleteMyWork(workId) {
+            if (!confirm('确定要删除这个作品吗？')) return;
+
+            try {
+                var res = await fetch('http://localhost:3000/api/works/' + workId, { method: 'DELETE' });
+                var data = await res.json();
+
+                if (data.success) {
+                    alert('删除成功');
+                    loadMyWorks();
+                } else {
+                    alert('删除失败');
+                }
+            } catch (err) {
+                alert('删除失败，请重试');
+            }
+        }
+
+        // 检查通知
+        async function checkNotifications() {
+            var userId = localStorage.getItem('userId');
+            if (!userId) return;
+
+            try {
+                var res = await fetch('http://localhost:3000/api/works/notifications/' + userId);
+                var data = await res.json();
+
+                if (data.success && data.data.length > 0) {
+                    var unreadCount = data.data.filter(function(n) { return !n.read; }).length;
+                    if (unreadCount > 0) {
+                        showNotificationBell(unreadCount, data.data);
+                    }
+                }
+            } catch (err) {
+                console.log('通知加载失败');
+            }
+        }
+
+        // 显示通知提示
+        function showNotificationBell(count, notifications) {
+            // 创建通知徽章
+            var bell = document.createElement('div');
+            bell.id = 'notification-bell';
+            bell.style.cssText = 'position:fixed;top:80px;right:20px;z-index:1000;background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.15);max-width:320px;cursor:pointer;';
+            bell.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
+            bell.innerHTML += '<span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:10px;font-size:12px;">' + count + '</span>';
+            bell.innerHTML += '<strong style="color:#1a1a3e;">您有新的审核通知</strong></div>';
+            bell.innerHTML += '<p style="margin:0;font-size:13px;color:#666;">点击查看详情</p>';
+
+            bell.addEventListener('click', function() {
+                showNotificationDetail(notifications);
+                bell.remove();
+            });
+
+            document.body.appendChild(bell);
+
+            // 5秒后自动消失
+            setTimeout(function() {
+                if (document.getElementById('notification-bell')) {
+                    bell.remove();
+                }
+            }, 10000);
+        }
+
+        // 显示通知详情
+        function showNotificationDetail(notifications) {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1001;display:flex;align-items:center;justify-content:center;';
+
+            var modal = document.createElement('div');
+            modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;';
+            modal.innerHTML = '<h3 style="margin:0 0 16px;color:#1a1a3e;"><i class="fas fa-bell" style="color:#d4af37;margin-right:8px;"></i>审核通知</h3>';
+
+            notifications.slice(0, 10).forEach(function(notif) {
+                var bgColor = notif.type === 'approval' ? '#e8f5e9' : '#fff5f5';
+                var borderColor = notif.type === 'approval' ? '#c8e6c9' : '#ffcccc';
+                var icon = notif.type === 'approval' ? 'fa-check-circle' : 'fa-times-circle';
+                var iconColor = notif.type === 'approval' ? '#27ae60' : '#e74c3c';
+
+                modal.innerHTML += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:8px;padding:12px;margin-bottom:10px;">';
+                modal.innerHTML += '<p style="margin:0 0 6px;font-size:14px;color:#333;"><i class="fas ' + icon + '" style="color:' + iconColor + ';margin-right:6px;"></i>' + notif.message + '</p>';
+                modal.innerHTML += '<p style="margin:0;font-size:12px;color:#999;">' + new Date(notif.createdAt).toLocaleString('zh-CN') + '</p>';
+                modal.innerHTML += '</div>';
+            });
+
+            modal.innerHTML += '<button onclick="this.closest(\'div\').parentElement.remove(); loadMyWorks();" style="width:100%;padding:12px;background:#d4af37;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;margin-top:10px;">我知道了</button>';
+
+            overlay.appendChild(modal);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+            document.body.appendChild(overlay);
+        }
+
+        // 提交作品
+        async function submitWork(status) {
+            if (!convertedHtml && status === 'pending') {
+                alert('请先上传并转换文档！');
+                return;
+            }
+
+            var progressBar = document.getElementById('upload-progress');
+            var progressFill = document.getElementById('progress-fill');
+            var progressText = document.getElementById('progress-text');
+
+            progressBar.style.display = 'block';
+            progressFill.style.width = '10%';
+            progressText.textContent = status === 'draft' ? '保存草稿中...' : '提交中...';
+
+            try {
+                var title = document.getElementById('work-title').value;
+                var typeMap = { drama: '剧本', audiobook: '有声书', shortplay: '短剧', pia: '剧本' };
+                var type = typeMap[document.getElementById('work-type').value] || '剧本';
+                var language = document.getElementById('work-language').value;
+                var summary = document.getElementById('work-summary').value;
+                var source = document.getElementById('work-source').value;
+                var reprint = document.getElementById('work-reprint').value;
+                var tags = Array.from(document.querySelectorAll('input[name="tags"]:checked'))
+                    .map(function(cb) { return cb.value; }).join(',');
+
+                progressFill.style.width = '30%';
+
+                // 处理封面
+                var coverUrl = '';
+                var coverInput = document.getElementById('work-cover');
+                if (coverInput.files && coverInput.files[0]) {
+                    coverUrl = await new Promise(function(resolve) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) { resolve(e.target.result); };
+                        reader.readAsDataURL(coverInput.files[0]);
+                    });
+                }
+
+                progressFill.style.width = '50%';
+                progressText.textContent = status === 'draft' ? '保存中...' : '上传中...';
+
+                var payload = {
+                    title: title || '未命名作品',
+                    type: type,
+                    language: language,
+                    summary: summary,
+                    content: convertedHtml || '',
+                    contentHtml: convertedHtml || '',
+                    cover: coverUrl,
+                    tags: tags,
+                    source: source,
+                    reprint: reprint,
+                    status: status,
+                    userId: localStorage.getItem('userId') || 'anonymous',
+                    authorName: localStorage.getItem('username') || '匿名用户'
+                };
+
+                var isEditing = uploadForm.dataset.editId;
+                var apiUrl = 'http://localhost:3000/api/works';
+                var method = 'POST';
+
+                if (isEditing) {
+                    apiUrl = 'http://localhost:3000/api/works/' + isEditing;
+                    method = 'PUT';
+                }
+
+                var res = await fetch(apiUrl, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                var data = await res.json();
+
+                if (data.success) {
+                    progressFill.style.width = '100%';
+                    progressText.textContent = status === 'draft' ? '草稿已保存！' : '提交成功！';
+
+                    if (status === 'draft') {
+                        alert('草稿已保存，您可以在"我的作品"中找到它');
+                    } else {
+                        alert('作品已提交，等待管理员审核');
+                    }
+
+                    uploadForm.reset();
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    removeFile();
+                    audioFiles = [];
+                    renderAudioList();
+                    var coverPreview = document.getElementById('cover-preview');
+                    if (coverPreview) coverPreview.innerHTML = '';
+                    document.getElementById('agree-terms').checked = false;
+
+                    // 删除编辑标记
+                    delete uploadForm.dataset.editId;
+
+                    // 刷新我的作品列表
+                    loadMyWorks();
+                } else {
+                    alert('操作失败: ' + data.message);
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }
+            } catch (err) {
+                alert('操作失败，请确保服务器已启动');
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        }
+    </script>
+</body>
+</html>
