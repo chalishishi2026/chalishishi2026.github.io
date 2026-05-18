@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队风采 - 肆顾门数字文化</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/logo.png" alt="肆顾门 logo">
+                <span>肆顾门数字文化</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="news.html">行业资讯</a></li>
+                <li><a href="team.html" class="active">团队风采</a></li>
+                <li><a href="works.html">原创剧本馆</a></li>
+                <li><a href="submit.html" class="btn-submit">创作中心</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面标题 -->
+    <section class="page-header">
+        <div class="container">
+            <h1>团队风采</h1>
+            <p>专业团队，用心创作每一部作品</p>
+        </div>
+    </section>
+
+    <!-- 分类筛选 -->
+    <section class="team-filter">
+        <div class="container">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="核心团队">核心团队</button>
+            <button class="filter-btn" data-filter="配音演员">配音演员</button>
+            <button class="filter-btn" data-filter="编剧">编剧</button>
+            <button class="filter-btn" data-filter="制作人">制作人</button>
+        </div>
+    </section>
+
+    <!-- 团队成员展示 -->
+    <section class="team-list">
+        <div class="container">
+            <div class="team-grid" id="team-container">
+                <!-- 动态加载团队成员 -->
+                <div class="team-card loading">
+                    <div class="team-avatar"></div>
+                    <div class="team-info">
+                        <h3>加载中...</h3>
+                        <p class="team-position">--</p>
+                        <p class="team-bio">正在加载团队成员信息...</p>
+                        <div class="team-actions">
+                            <button class="btn-play-demo" disabled>
+                                <i class="fas fa-play"></i> 试听Demo
+                            </button>
+                            <a href="#" class="btn-view-works" disabled>
+                                <i class="fas fa-book"></i> 查看作品
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card loading">
+                    <div class="team-avatar"></div>
+                    <div class="team-info">
+                        <h3>加载中...</h3>
+                        <p class="team-position">--</p>
+                        <p class="team-bio">正在加载团队成员信息...</p>
+                        <div class="team-actions">
+                            <button class="btn-play-demo" disabled>
+                                <i class="fas fa-play"></i> 试听Demo
+                            </button>
+                            <a href="#" class="btn-view-works" disabled>
+                                <i class="fas fa-book"></i> 查看作品
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 声音播放器（全局） -->
+    <div class="audio-player" id="audio-player" style="display: none;">
+        <div class="player-content">
+            <button class="player-close"><i class="fas fa-times"></i></button>
+            <h3 id="player-title">正在播放：团队成员Demo</h3>
+            <audio controls id="player-audio">
+                <source src="" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>肆顾门数字文化</h3>
+                    <p>专业从事有声内容创作、剧本孵化、配音培训</p>
+                </div>
+                <div class="footer-col">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="news.html">行业资讯</a></li>
+                        <li><a href="team.html">团队风采</a></li>
+                        <li><a href="works.html">原创剧本馆</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>创作服务</h3>
+                    <ul>
+                        <li><a href="submit.html">上传作品</a></li>
+                        <li><a href="#">配音制作</a></li>
+                        <li><a href="#">剧本创作</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>关注我们</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 肆顾门数字文化（南通）有限公司</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

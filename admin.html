@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>肆顾门 - 管理后台</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1a1a3e;
+      --primary-light: #2d2d5a;
+      --accent: #d4af37;
+      --accent-light: #e8c860;
+      --danger: #e74c3c;
+      --success: #27ae60;
+      --text: #333;
+      --text-light: #666;
+      --border: #e0e0e0;
+      --bg: #f5f6fa;
+      --white: #fff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* 登录页面 */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    }
+
+    .login-box {
+      background: var(--white);
+      padding: 40px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .login-box h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .login-box p {
+      text-align: center;
+      color: var(--text-light);
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--primary);
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-light);
+    }
+
+    .btn-secondary {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: var(--white);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: var(--white);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .login-error {
+      color: var(--danger);
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    /* 管理后台布局 */
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* 侧边栏 */
+    .sidebar {
+      width: 240px;
+      background: var(--primary);
+      color: var(--white);
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .sidebar-header p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    .nav-item {
+      padding: 14px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.15);
+      border-left-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    /* 顶部栏 */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .topbar h1 {
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-info span {
+      color: var(--text-light);
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .stat-card h3 {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card.warning .value {
+      color: var(--danger);
+    }
+
+    /* 内容区域 */
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filters select,
+    .filters input {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    /* 数据表格 */
+    .data-table {
+      width: 100%;
+      background: var(--white);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .data-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+      background: var(--bg);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .data-table tr:hover {
+      background: var(--bg);
+    }
+
+    .data-table .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-badge.draft {
+      background: #e9ecef;
+      color: #6c757d;
+    }
+
+    .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.approved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .table-cover {
+      width: 60px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    /* 模态框 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+    }
+
+    .modal-large {
+      max-width: 1100px;
+    }
+
+    .modal h2 {
+      margin-bottom: 24px;
+      color: var(--primary);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Toast 提示 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .sidebar {
+        width: 200px;
+      }
+      .main-content {
+        margin-left: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+    }
+
+    /* ========== 作品预览模态框 ========== */
+    .preview-modal {
+      max-width: 1100px;
+    }
+
+    .preview-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      min-height: 500px;
+    }
+
+    .preview-info {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .preview-cover {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      background: #ddd;
+    }
+
+    .preview-info-item {
+      margin-bottom: 14px;
+    }
+
+    .preview-info-label {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+
+    .preview-info-value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .preview-info-value.title {
+      font-size: 16px;
+      color: var(--primary);
+      word-break: break-all;
+    }
+
+    .preview-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .preview-tag {
+      background: var(--primary);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    .preview-content {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 30px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .preview-content h1,
+    .preview-content h2,
+    .preview-content h3 {
+      color: var(--primary);
+      margin: 1em 0 0.5em;
+    }
+
+    .preview-content p {
+      line-height: 1.8;
+      margin-bottom: 1em;
+      color: #333;
+    }
+
+    .preview-content img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .preview-content pre {
+      background: #f5f5f5;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .preview-audio-section {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+
+    .preview-audio-section h4 {
+      margin-bottom: 12px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-audio-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .preview-audio-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .preview-audio-name {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .preview-audio-player {
+      width: 150px;
+      height: 30px;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .preview-actions .btn {
+      flex: 1;
+    }
+
+    .preview-empty-content {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+
+    .preview-empty-content i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body>
+  <!-- 登录页面 -->
+  <div id="loginPage" class="login-container">
+    <div class="login-box">
+      <h1>肆顾门管理后台</h1>
+      <p>请登录以继续</p>
+      <div id="loginError" class="login-error"></div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" id="username" placeholder="请输入用户名" required>
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="password" placeholder="请输入密码" required>
+        </div>
+        <button type="submit" class="btn btn-primary">登 录</button>
+      </form>
+      <p style="margin-top: 20px; font-size: 12px; color: #999;">
+        默认账号: admin / admin123
+      </p>
+    </div>
+  </div>
+
+  <!-- 管理后台 -->
+  <div id="adminPage" class="admin-layout" style="display: none;">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>肆顾门</h2>
+        <p>管理后台</p>
+      </div>
+      <div class="nav-item active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        仪表盘
+      </div>
+      <div class="nav-item" data-section="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+        资讯管理
+      </div>
+      <div class="nav-item" data-section="team">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
+        团队管理
+      </div>
+      <div class="nav-item" data-section="works">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        作品管理
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 顶部栏 -->
+      <div class="topbar">
+        <h1 id="pageTitle">仪表盘</h1>
+        <div class="user-info">
+          <span id="adminNickname">管理员</span>
+          <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+      </div>
+
+      <!-- 仪表盘 -->
+      <div id="dashboardSection" class="content-section active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>资讯数量</h3>
+            <div class="value" id="statNews">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>团队成员</h3>
+            <div class="value" id="statTeam">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>作品数量</h3>
+            <div class="value" id="statWorks">0</div>
+          </div>
+          <div class="stat-card warning">
+            <h3>待审核</h3>
+            <div class="value" id="statPending">0</div>
+          </div>
+        </div>
+        <div class="data-table">
+          <h3 style="padding: 16px; border-bottom: 1px solid var(--border);">快速操作</h3>
+          <div style="padding: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="switchSection('news'); openModal('newsModal')">添加资讯</button>
+            <button class="btn btn-secondary" onclick="switchSection('team'); openModal('teamModal')">添加成员</button>
+            <button class="btn btn-secondary" onclick="switchSection('works'); openModal('worksModal')">添加作品</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 资讯管理 -->
+      <div id="newsSection" class="content-section">
+        <div class="section-header">
+          <div class="filters">
+            <select id="newsCategoryFilter" onchange="loadNews()">
+              <option value="全部">全部分类</option>
+              <option value="公司动态">公司动态</option>
+              <option value="项目动态">项目动态</option>
+              <option value="行业资讯">行业资讯</option>
+            </select>
+            <input type="text" id="newsSearch" placeholder="搜索资讯..." onkeyup="loadNews()">
+          </div>
+          <button class="btn btn-primary" onclick="openModal('newsModal')">+ 添加资讯</button>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>标题</th>
+                <th>分类</th>
+                <th>日期</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="newsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 团队管理 -->
+      <div id="teamSection" class="content-section">
+        <div class="section-header">
+          <div class="filters">
+            <select id="teamCategoryFilter" onchange="loadTeam()">
+              <option value="全部">全部分类</option>
+              <option value="核心团队">核心团队</option>
+              <option value="签约艺人">签约艺人</option>
+              <option value="合作艺人">合作艺人</option>
+            </select>
+            <input type="text" id="teamSearch" placeholder="搜索成员..." onkeyup="loadTeam()">
+          </div>
+          <button class="btn btn-primary" onclick="openModal('teamModal')">+ 添加成员</button>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>职位</th>
+                <th>分类</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="teamTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 作品管理 -->
+      <div id="worksSection" class="content-section">
+        <div class="section-header">
+          <div class="filters">
+            <select id="worksTypeFilter" onchange="loadWorks()">
+              <option value="全部">全部类型</option>
+              <option value="游戏">游戏</option>
+              <option value="短剧">短剧</option>
+              <option value="剧本">剧本</option>
+              <option value="有声书">有声书</option>
+            </select>
+            <select id="worksStatusFilter" onchange="loadWorks()">
+              <option value="全部">全部状态</option>
+              <option value="draft">草稿</option>
+              <option value="pending">待审核</option>
+              <option value="approved">已通过</option>
+              <option value="rejected">已拒绝</option>
+            </select>
+            <input type="text" id="worksSearch" placeholder="搜索作品..." onkeyup="loadWorks()">
+          </div>
+          <button class="btn btn-primary" onclick="openModal('worksModal')">+ 添加作品</button>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>封面</th>
+                <th>标题</th>
+                <th>类型</th>
+                <th>语言</th>
+                <th>标签</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="worksTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 资讯模态框 -->
+  <div id="newsModal" class="modal-overlay">
+    <div class="modal">
+      <h2 id="newsModalTitle">添加资讯</h2>
+      <form id="newsForm">
+        <input type="hidden" id="newsId">
+        <div class="form-group">
+          <label>标题 *</label>
+          <input type="text" id="newsTitle" required>
+        </div>
+        <div class="form-group">
+          <label>分类 *</label>
+          <select id="newsCategory" required>
+            <option value="公司动态">公司动态</option>
+            <option value="项目动态">项目动态</option>
+            <option value="行业资讯">行业资讯</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>摘要</label>
+          <textarea id="newsSummary"></textarea>
+        </div>
+        <div class="form-group">
+          <label>内容</label>
+          <textarea id="newsContent" style="min-height: 200px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>封面图片URL</label>
+          <input type="text" id="newsImage" placeholder="assets/images/...">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('newsModal')">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 团队模态框 -->
+  <div id="teamModal" class="modal-overlay">
+    <div class="modal">
+      <h2 id="teamModalTitle">添加成员</h2>
+      <form id="teamForm">
+        <input type="hidden" id="teamId">
+        <div class="form-group">
+          <label>姓名 *</label>
+          <input type="text" id="teamName" required>
+        </div>
+        <div class="form-group">
+          <label>职位 *</label>
+          <input type="text" id="teamPosition" required>
+        </div>
+        <div class="form-group">
+          <label>分类</label>
+          <select id="teamCategory">
+            <option value="核心团队">核心团队</option>
+            <option value="签约艺人">签约艺人</option>
+            <option value="合作艺人">合作艺人</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>简介</label>
+          <textarea id="teamBio"></textarea>
+        </div>
+        <div class="form-group">
+          <label>头像URL</label>
+          <input type="text" id="teamAvatar" placeholder="assets/images/avatar-default.png">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('teamModal')">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 作品模态框 -->
+  <div id="worksModal" class="modal-overlay">
+    <div class="modal">
+      <h2 id="worksModalTitle">添加作品</h2>
+      <form id="worksForm">
+        <input type="hidden" id="worksId">
+        <div class="form-group">
+          <label>标题 *</label>
+          <input type="text" id="worksTitle" required>
+        </div>
+        <div class="form-group">
+          <label>类型 *</label>
+          <select id="worksType" required>
+            <option value="游戏">游戏</option>
+            <option value="短剧">短剧</option>
+            <option value="剧本">剧本</option>
+            <option value="有声书">有声书</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>摘要</label>
+          <textarea id="worksSummary"></textarea>
+        </div>
+        <div class="form-group">
+          <label>内容</label>
+          <textarea id="worksContent" style="min-height: 200px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>封面URL</label>
+          <input type="text" id="worksCover" placeholder="assets/images/...">
+        </div>
+        <div class="form-group">
+          <label>音频URL</label>
+          <input type="text" id="worksAudioUrl" placeholder="assets/audio/...">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('worksModal')">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 作品预览模态框 -->
+  <div id="previewModal" class="modal-overlay">
+    <div class="modal preview-modal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 id="previewModalTitle">作品预览</h2>
+        <button onclick="closeModal('previewModal')" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light);">&times;</button>
+      </div>
+      <div class="preview-layout">
+        <!-- 左侧信息栏 -->
+        <div class="preview-info">
+          <img id="previewCover" class="preview-cover" src="assets/images/default-cover.jpg" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22320%22><rect fill=%22%23ddd%22 width=%22240%22 height=%22320%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2214%22>暂无封面</text></svg>'">
+          <div class="preview-info-item">
+            <div class="preview-info-label">作品标题</div>
+            <div id="previewTitle" class="preview-info-value title">-</div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">作品类型</div>
+            <div id="previewType" class="preview-info-value">-</div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">语言</div>
+            <div id="previewLanguage" class="preview-info-value">-</div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">状态</div>
+            <div id="previewStatus" class="preview-info-value">-</div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">作者</div>
+            <div id="previewAuthor" class="preview-info-value">-</div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">提交时间</div>
+            <div id="previewDate" class="preview-info-value">-</div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">标签</div>
+            <div id="previewTags" class="preview-tags"></div>
+          </div>
+          <div class="preview-info-item">
+            <div class="preview-info-label">摘要</div>
+            <div id="previewSummary" class="preview-info-value" style="font-size: 12px; font-weight: normal; line-height: 1.5;">-</div>
+          </div>
+        </div>
+        <!-- 右侧内容区 -->
+        <div class="preview-content" id="previewContentArea">
+          <div class="preview-empty-content">
+            <i class="fas fa-file-alt"></i>
+            <p>暂无内容</p>
+          </div>
+        </div>
+      </div>
+      <!-- 底部操作按钮 -->
+      <div class="preview-actions">
+        <button class="btn btn-secondary" onclick="openEditFromPreview()">
+          <i class="fas fa-edit"></i> 编辑
+        </button>
+        <button class="btn btn-success" id="btnApprove" onclick="approveWorksFromPreview()">
+          <i class="fas fa-check"></i> 通过
+        </button>
+        <button class="btn btn-danger" id="btnReject" onclick="rejectWorksFromPreview()">
+          <i class="fas fa-times"></i> 拒绝
+        </button>
+        <button class="btn btn-danger" onclick="deleteWorksFromPreview()">
+          <i class="fas fa-trash"></i> 删除
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拒绝原因模态框 -->
+  <div id="rejectModal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px;">
+      <h2 id="rejectModalTitle"><i class="fas fa-times-circle" style="color: var(--danger); margin-right: 8px;"></i>审核拒绝</h2>
+      <form id="rejectForm">
+        <input type="hidden" id="rejectWorkId">
+        <div class="form-group">
+          <label for="rejectReason"><i class="fas fa-comment-alt" style="color: var(--danger); margin-right: 6px;"></i>拒绝原因 *</label>
+          <textarea id="rejectReason" rows="4" required placeholder="请输入审核拒绝的具体原因，以便作者修改后重新提交..."></textarea>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lightbulb" style="color: #f39c12; margin-right: 6px;"></i>常见拒绝原因（可一键填入）</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="setRejectReason('作品内容不符合平台定位，请修改后重新提交')">内容不符</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="setRejectReason('作品格式不规范，请参考平台规范进行修改')">格式不规范</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="setRejectReason('作品存在侵权风险，请确认素材来源后重新提交')">侵权风险</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="setRejectReason('作品质量未达到展示标准，请优化后重新提交')">质量不足</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('rejectModal')">取消</button>
+          <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> 确认拒绝</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // API 基础地址
+    const API_BASE = 'http://localhost:3000/api';
+
+    // 当前登录用户
+    let currentAdmin = null;
+
+    // ========== 初始化 ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      checkLogin();
+      setupEventListeners();
+    });
+
+    // 检查登录状态
+    function checkLogin() {
+      const admin = localStorage.getItem('admin');
+      if (admin) {
+        currentAdmin = JSON.parse(admin);
+        showAdminPage();
+      } else {
+        showLoginPage();
+      }
+    }
+
+    // 显示登录页
+    function showLoginPage() {
+      document.getElementById('loginPage').style.display = 'flex';
+      document.getElementById('adminPage').style.display = 'none';
+    }
+
+    // 显示管理后台
+    function showAdminPage() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPage').style.display = 'flex';
+      document.getElementById('adminNickname').textContent = currentAdmin.nickname || currentAdmin.username;
+      loadStats();
+    }
+
+    // ========== 登录相关 ==========
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          currentAdmin = data.data;
+          localStorage.setItem('admin', JSON.stringify(currentAdmin));
+          showAdminPage();
+          showToast('登录成功', 'success');
+        } else {
+          document.getElementById('loginError').textContent = data.message;
+        }
+      } catch (err) {
+        document.getElementById('loginError').textContent = '连接服务器失败，请确保服务器已启动';
+      }
+    });
+
+    // 退出登录
+    function logout() {
+      localStorage.removeItem('admin');
+      currentAdmin = null;
+      showLoginPage();
+      showToast('已退出登录', 'success');
+    }
+
+    // ========== 导航切换 ==========
+    function setupEventListeners() {
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const section = item.dataset.section;
+          switchSection(section);
+        });
+      });
+
+      // 表单提交
+      document.getElementById('newsForm').addEventListener('submit', handleNewsSubmit);
+      document.getElementById('teamForm').addEventListener('submit', handleTeamSubmit);
+      document.getElementById('worksForm').addEventListener('submit', handleWorksSubmit);
+    }
+
+    function switchSection(section) {
+      // 更新导航
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.section === section);
+      });
+
+      // 更新内容区
+      document.querySelectorAll('.content-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      document.getElementById(`${section}Section`).classList.add('active');
+
+      // 更新标题
+      const titles = { dashboard: '仪表盘', news: '资讯管理', team: '团队管理', works: '作品管理' };
+      document.getElementById('pageTitle').textContent = titles[section];
+
+      // 加载数据
+      if (section === 'news') loadNews();
+      if (section === 'team') loadTeam();
+      if (section === 'works') loadWorks();
+    }
+
+    // ========== 模态框 ==========
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+      // 重置表单
+      document.getElementById(modalId.replace('Modal', 'Form')).reset();
+      document.getElementById(modalId.replace('Modal', 'Id')).value = '';
+    }
+
+    // 点击遮罩关闭
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('show');
+        }
+      });
+    });
+
+    // ========== 统计数据 ==========
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_BASE}/stats`);
+        const data = await res.json();
+        document.getElementById('statNews').textContent = data.news || 0;
+        document.getElementById('statTeam').textContent = data.team || 0;
+        document.getElementById('statWorks').textContent = data.works || 0;
+        document.getElementById('statPending').textContent = data.pendingWorks || 0;
+      } catch (err) {
+        console.error('Load stats error:', err);
+      }
+    }
+
+    // ========== 资讯管理 ==========
+    async function loadNews() {
+      const category = document.getElementById('newsCategoryFilter').value;
+      const keyword = document.getElementById('newsSearch').value;
+
+      try {
+        let url = `${API_BASE}/news?category=${encodeURIComponent(category)}`;
+        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          renderNewsTable(data.data);
+        }
+      } catch (err) {
+        console.error('Load news error:', err);
+      }
+    }
+
+    function renderNewsTable(news) {
+      const tbody = document.getElementById('newsTableBody');
+
+      if (news.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">暂无资讯</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = news.map(item => `
+        <tr>
+          <td>${item.title}</td>
+          <td><span class="status-badge">${item.category}</span></td>
+          <td>${item.date}</td>
+          <td class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editNews('${item.id}')">编辑</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteNews('${item.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function editNews(id) {
+      const res = await fetch(`${API_BASE}/news/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const item = data.data;
+        document.getElementById('newsId').value = item.id;
+        document.getElementById('newsTitle').value = item.title;
+        document.getElementById('newsCategory').value = item.category;
+        document.getElementById('newsSummary').value = item.summary || '';
+        document.getElementById('newsContent').value = item.content || '';
+        document.getElementById('newsImage').value = item.image || '';
+        document.getElementById('newsModalTitle').textContent = '编辑资讯';
+        openModal('newsModal');
+      }
+    }
+
+    async function deleteNews(id) {
+      if (!confirm('确定要删除这条资讯吗？')) return;
+
+      const res = await fetch(`${API_BASE}/news/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('删除成功', 'success');
+        loadNews();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    async function handleNewsSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('newsId').value;
+      const payload = {
+        title: document.getElementById('newsTitle').value,
+        category: document.getElementById('newsCategory').value,
+        summary: document.getElementById('newsSummary').value,
+        content: document.getElementById('newsContent').value,
+        image: document.getElementById('newsImage').value
+      };
+
+      const url = id ? `${API_BASE}/news/${id}` : `${API_BASE}/news`;
+      const method = id ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showToast(id ? '更新成功' : '添加成功', 'success');
+        closeModal('newsModal');
+        loadNews();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    // ========== 团队管理 ==========
+    async function loadTeam() {
+      const category = document.getElementById('teamCategoryFilter').value;
+      const keyword = document.getElementById('teamSearch').value;
+
+      try {
+        let url = `${API_BASE}/team?category=${encodeURIComponent(category)}`;
+        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          renderTeamTable(data.data);
+        }
+      } catch (err) {
+        console.error('Load team error:', err);
+      }
+    }
+
+    function renderTeamTable(team) {
+      const tbody = document.getElementById('teamTableBody');
+
+      if (team.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">暂无成员</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = team.map(item => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.position}</td>
+          <td><span class="status-badge">${item.category}</span></td>
+          <td class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editTeam('${item.id}')">编辑</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTeam('${item.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function editTeam(id) {
+      const res = await fetch(`${API_BASE}/team/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const item = data.data;
+        document.getElementById('teamId').value = item.id;
+        document.getElementById('teamName').value = item.name;
+        document.getElementById('teamPosition').value = item.position;
+        document.getElementById('teamCategory').value = item.category;
+        document.getElementById('teamBio').value = item.bio || '';
+        document.getElementById('teamAvatar').value = item.avatar || '';
+        document.getElementById('teamModalTitle').textContent = '编辑成员';
+        openModal('teamModal');
+      }
+    }
+
+    async function deleteTeam(id) {
+      if (!confirm('确定要删除这个成员吗？')) return;
+
+      const res = await fetch(`${API_BASE}/team/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('删除成功', 'success');
+        loadTeam();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    async function handleTeamSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('teamId').value;
+      const payload = {
+        name: document.getElementById('teamName').value,
+        position: document.getElementById('teamPosition').value,
+        category: document.getElementById('teamCategory').value,
+        bio: document.getElementById('teamBio').value,
+        avatar: document.getElementById('teamAvatar').value
+      };
+
+      const url = id ? `${API_BASE}/team/${id}` : `${API_BASE}/team`;
+      const method = id ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showToast(id ? '更新成功' : '添加成功', 'success');
+        closeModal('teamModal');
+        loadTeam();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    // ========== 作品管理 ==========
+    async function loadWorks() {
+      const type = document.getElementById('worksTypeFilter').value;
+      const status = document.getElementById('worksStatusFilter').value;
+      const keyword = document.getElementById('worksSearch').value;
+
+      try {
+        let url = `${API_BASE}/works?type=${encodeURIComponent(type)}&status=${encodeURIComponent(status)}`;
+        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          renderWorksTable(data.data);
+        }
+      } catch (err) {
+        console.error('Load works error:', err);
+      }
+    }
+
+    function renderWorksTable(works) {
+      const tbody = document.getElementById('worksTableBody');
+
+      if (works.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state">暂无作品</td></tr>`;
+        return;
+      }
+
+      const statusText = { draft: '草稿', pending: '待审核', approved: '已通过', rejected: '已拒绝' };
+
+      tbody.innerHTML = works.map(item => `
+        <tr>
+          <td><img src="${item.cover || 'assets/images/default-cover.jpg'}" class="table-cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2240%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2240%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22>无图</text></svg>'"></td>
+          <td>${item.title}</td>
+          <td>${item.type}</td>
+          <td>${item.language || '-'}</td>
+          <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${item.tags || ''}">${item.tags ? item.tags.split(',').slice(0,2).join(',') + (item.tags.split(',').length > 2 ? '...' : '') : '-'}</td>
+          <td><span class="status-badge ${item.status}">${statusText[item.status] || item.status}</span></td>
+          <td class="actions">
+            <button class="btn btn-primary btn-sm" onclick="previewWorks('${item.id}')" style="background: #6c5ce7;">预览</button>
+            <button class="btn btn-secondary btn-sm" onclick="editWorks('${item.id}')">编辑</button>
+            ${item.status === 'pending' ? `
+              <button class="btn btn-success btn-sm" onclick="approveWorks('${item.id}')">通过</button>
+              <button class="btn btn-danger btn-sm" onclick="rejectWorks('${item.id}')">拒绝</button>
+            ` : ''}
+            ${item.status === 'draft' ? `
+              <button class="btn btn-success btn-sm" onclick="submitWorks('${item.id}')">提交</button>
+            ` : ''}
+            <button class="btn btn-danger btn-sm" onclick="deleteWorks('${item.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function editWorks(id) {
+      const res = await fetch(`${API_BASE}/works/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const item = data.data;
+        document.getElementById('worksId').value = item.id;
+        document.getElementById('worksTitle').value = item.title;
+        document.getElementById('worksType').value = item.type;
+        document.getElementById('worksSummary').value = item.summary || '';
+        document.getElementById('worksContent').value = item.content || '';
+        document.getElementById('worksCover').value = item.cover || '';
+        document.getElementById('worksAudioUrl').value = item.audioUrl || '';
+        document.getElementById('worksModalTitle').textContent = '编辑作品';
+        openModal('worksModal');
+      }
+    }
+
+    // 提交草稿
+    async function submitWorks(id) {
+      const res = await fetch(`${API_BASE}/works/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'pending' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('已提交审核', 'success');
+        loadWorks();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    async function deleteWorks(id) {
+      if (!confirm('确定要删除这个作品吗？')) return;
+
+      const res = await fetch(`${API_BASE}/works/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('删除成功', 'success');
+        loadWorks();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    // ========== 审核拒绝 ==========
+    // 设置拒绝原因快捷填入
+    function setRejectReason(text) {
+      document.getElementById('rejectReason').value = text;
+    }
+
+    // 打开拒绝模态框
+    function openRejectModal(workId) {
+      document.getElementById('rejectWorkId').value = workId;
+      document.getElementById('rejectReason').value = '';
+      openModal('rejectModal');
+    }
+
+    // 拒绝表单提交
+    document.getElementById('rejectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const workId = document.getElementById('rejectWorkId').value;
+      const reason = document.getElementById('rejectReason').value;
+
+      if (!reason.trim()) {
+        alert('请输入拒绝原因');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/works/${workId}/reject`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast('已拒绝，审核通知已发送', 'success');
+          closeModal('rejectModal');
+          loadWorks();
+          loadStats();
+          // 如果是从预览拒绝的，关闭预览模态框
+          if (currentPreviewId === workId) {
+            closeModal('previewModal');
+          }
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('操作失败', 'error');
+      }
+    });
+
+    async function rejectWorks(id) {
+      openRejectModal(id);
+    }
+
+    async function approveWorks(id) {
+      const res = await fetch(`${API_BASE}/works/${id}/approve`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('审核通过，审核通知已发送', 'success');
+        loadWorks();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    async function handleWorksSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('worksId').value;
+      const payload = {
+        title: document.getElementById('worksTitle').value,
+        type: document.getElementById('worksType').value,
+        summary: document.getElementById('worksSummary').value,
+        content: document.getElementById('worksContent').value,
+        cover: document.getElementById('worksCover').value,
+        audioUrl: document.getElementById('worksAudioUrl').value
+      };
+
+      const url = id ? `${API_BASE}/works/${id}` : `${API_BASE}/works`;
+      const method = id ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showToast(id ? '更新成功' : '添加成功', 'success');
+        closeModal('worksModal');
+        loadWorks();
+        loadStats();
+      } else {
+        showToast(data.message, 'error');
+      }
+    }
+
+    // ========== 作品预览 ==========
+    let currentPreviewId = null;
+
+    // 打开预览
+    async function previewWorks(id) {
+      currentPreviewId = id;
+      const res = await fetch(`${API_BASE}/works/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const item = data.data;
+        
+        // 设置基本信息
+        document.getElementById('previewCover').src = item.cover || 'assets/images/default-cover.jpg';
+        document.getElementById('previewTitle').textContent = item.title || '-';
+        document.getElementById('previewType').textContent = item.type || '-';
+        document.getElementById('previewLanguage').textContent = item.language || '-';
+        document.getElementById('previewAuthor').textContent = item.authorName || item.userName || item.submitter || '未知';
+        document.getElementById('previewDate').textContent = item.submittedAt ? new Date(item.submittedAt).toLocaleString('zh-CN') : (item.date || '-');
+        document.getElementById('previewSummary').textContent = item.summary || '暂无摘要';
+
+        // 状态显示
+        const statusText = { draft: '草稿', pending: '待审核', approved: '已通过', rejected: '已拒绝' };
+        const statusEl = document.getElementById('previewStatus');
+
+        // 如果已拒绝，显示拒绝原因
+        if (item.status === 'rejected' && item.rejectionReason) {
+          statusEl.innerHTML = `<span style="color: var(--danger);">${statusText[item.status] || item.status}</span>
+            <div style="margin-top: 8px; padding: 10px; background: #fff5f5; border: 1px solid #ffcccc; border-radius: 6px; font-size: 12px; color: #666;">
+              <div style="font-weight: 600; color: var(--danger); margin-bottom: 4px;"><i class="fas fa-exclamation-triangle"></i> 拒绝原因：</div>
+              <div style="line-height: 1.5;">${item.rejectionReason}</div>
+            </div>`;
+        } else {
+          statusEl.textContent = statusText[item.status] || item.status || '-';
+        }
+
+        // 标签
+        const tagsEl = document.getElementById('previewTags');
+        if (item.tags) {
+          const tags = item.tags.split(',').filter(t => t.trim());
+          tagsEl.innerHTML = tags.map(tag => `<span class="preview-tag">${tag.trim()}</span>`).join('');
+        } else {
+          tagsEl.innerHTML = '<span style="color: var(--text-light); font-size: 12px;">无标签</span>';
+        }
+
+        // 内容预览
+        const contentArea = document.getElementById('previewContentArea');
+        if (item.contentHtml || item.content) {
+          contentArea.innerHTML = item.contentHtml || item.content;
+        } else {
+          contentArea.innerHTML = '<div class="preview-empty-content"><i class="fas fa-file-alt"></i><p>暂无内容</p></div>';
+        }
+
+        // 音频预览
+        if (item.audioFiles && item.audioFiles.length > 0) {
+          const audioSection = document.createElement('div');
+          audioSection.className = 'preview-audio-section';
+          audioSection.innerHTML = `
+            <h4><i class="fas fa-music"></i> 音频文件 (${item.audioFiles.length})</h4>
+            ${item.audioFiles.map((audio, index) => `
+              <div class="preview-audio-item">
+                <i class="fas fa-file-audio" style="color: var(--accent);"></i>
+                <span class="preview-audio-name">${audio.name || '音频 ' + (index + 1)}</span>
+                <audio controls class="preview-audio-player" src="${audio.url || audio}"></audio>
+              </div>
+            `).join('')}
+          `;
+          contentArea.appendChild(audioSection);
+        } else if (item.audioUrl) {
+          // 兼容单个音频URL
+          const audioSection = document.createElement('div');
+          audioSection.className = 'preview-audio-section';
+          audioSection.innerHTML = `
+            <h4><i class="fas fa-music"></i> 音频</h4>
+            <div class="preview-audio-item">
+              <i class="fas fa-file-audio" style="color: var(--accent);"></i>
+              <span class="preview-audio-name">${item.audioUrl.split('/').pop()}</span>
+              <audio controls class="preview-audio-player" src="${item.audioUrl}"></audio>
+            </div>
+          `;
+          contentArea.appendChild(audioSection);
+        }
+
+        // 根据状态显示/隐藏操作按钮
+        const btnApprove = document.getElementById('btnApprove');
+        const btnReject = document.getElementById('btnReject');
+        if (item.status === 'pending') {
+          btnApprove.style.display = '';
+          btnReject.style.display = '';
+        } else {
+          btnApprove.style.display = 'none';
+          btnReject.style.display = 'none';
+        }
+
+        openModal('previewModal');
+      }
+    }
+
+    // 从预览中编辑
+    function openEditFromPreview() {
+      if (currentPreviewId) {
+        closeModal('previewModal');
+        editWorks(currentPreviewId);
+      }
+    }
+
+    // 从预览中通过审核
+    async function approveWorksFromPreview() {
+      if (!currentPreviewId) return;
+      await approveWorks(currentPreviewId);
+      closeModal('previewModal');
+    }
+
+    // 从预览中拒绝
+    async function rejectWorksFromPreview() {
+      if (!currentPreviewId) return;
+      openRejectModal(currentPreviewId);
+    }
+
+    // 从预览中删除
+    async function deleteWorksFromPreview() {
+      if (!currentPreviewId) return;
+      if (!confirm('确定要删除这个作品吗？')) return;
+      await deleteWorks(currentPreviewId);
+      closeModal('previewModal');
+    }
+
+    // ========== Toast 提示 ==========
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+  </script>
+</body>
+</html>

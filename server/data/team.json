@@ -1,0 +1,12 @@
+[
+  {
+    "id": "team_001",
+    "name": "创始人",
+    "position": "CEO",
+    "category": "核心团队",
+    "bio": "深耕数字文化领域多年，带领团队打造优质内容。",
+    "avatar": "assets/images/avatar-default.png",
+    "order": 1,
+    "createdAt": "2026-01-10T08:00:00Z"
+  }
+]
