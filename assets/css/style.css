@@ -1507,3 +1507,197 @@ a:hover {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+/* ===== 行业资讯手风琴样式 ===== */
+.news-accordion-section {
+    padding: 4rem 0;
+    background: #f8f9fa;
+}
+
+.news-accordion {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.news-accordion-item {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.accordion-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.accordion-header:hover {
+    background: #f8f9fa;
+}
+
+.accordion-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.accordion-icon {
+    color: #c9a96e;
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+}
+
+.accordion-header.open .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-topic {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.accordion-date {
+    font-size: 0.85rem;
+    color: #999;
+    margin-left: 1rem;
+    white-space: nowrap;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s;
+    background: #fff;
+}
+
+.accordion-content.open {
+    max-height: 2000px;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.news-detail-intro {
+    background: linear-gradient(135deg, #c9a96e22, #c9a96e11);
+    border-left: 4px solid #c9a96e;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.8;
+}
+
+.news-detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.news-detail-section h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.news-detail-section h4::before {
+    content: "◆ ";
+    color: #c9a96e;
+    font-size: 0.7rem;
+}
+
+.news-detail-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.news-detail-section ul li {
+    padding: 0.4rem 0;
+    font-size: 0.92rem;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.6;
+}
+
+.news-detail-section ul li:last-child {
+    border-bottom: none;
+}
+
+.news-detail-section.useful h4 { color: #2d7d46; }
+.news-detail-section.useful h4::before { color: #2d7d46; }
+.news-detail-section.action h4 { color: #c97a1a; }
+.news-detail-section.action h4::before { color: #c97a1a; }
+
+/* ===== 新闻卡片在首页的样式 ===== */
+.news-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.news-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem 0;
+}
+
+.news-category {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #c9a96e;
+    background: #c9a96e18;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+}
+
+.news-date {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.news-card .news-content {
+    padding: 1rem 1.2rem 1.2rem;
+}
+
+.news-card h3 {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.news-card .news-summary {
+    font-size: 0.88rem;
+    color: #777;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+}
+
+.news-card .read-more {
+    font-size: 0.85rem;
+    color: #c9a96e;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.news-card .read-more:hover {
+    text-decoration: underline;
+}
