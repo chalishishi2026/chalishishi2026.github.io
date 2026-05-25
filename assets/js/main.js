@@ -219,15 +219,17 @@ function goToSlide(index) {
 // 加载资讯预览（首页）
 async function loadNewsPreview() {
     try {
-        const res = await fetch('http://localhost:3000/api/news');
-        const data = await res.json();
-
-        if (data.success && data.data.length > 0) {
-            // 取最新3条
-            newsData = data.data.slice(0, 3);
+        let data = [];
+        if (window.__NEWS_DATA__) {
+            data = window.__NEWS_DATA__.slice(0, 3);
         } else {
-            newsData = [];
+            const res = await fetch('http://localhost:3000/api/news');
+            const resData = await res.json();
+            if (resData.success && resData.data.length > 0) {
+                data = resData.data.slice(0, 3);
+            }
         }
+        newsData = data;
 
         const container = document.getElementById('news-preview');
         if (!container) return;
@@ -281,19 +283,21 @@ async function loadTeamPreview() {
 // 加载资讯列表（资讯页）
 async function loadNewsList() {
     try {
-        const res = await fetch('http://localhost:3000/api/news');
-        const data = await res.json();
-
-        if (data.success && data.data.length > 0) {
-            newsData = data.data;
+        let data = [];
+        if (window.__NEWS_DATA__) {
+            data = window.__NEWS_DATA__;
         } else {
-            newsData = [];
+            const res = await fetch('http://localhost:3000/api/news');
+            const resData = await res.json();
+            if (resData.success && resData.data.length > 0) {
+                data = resData.data;
+            }
         }
-
+        newsData = data;
         displayNewsPage(1);
     } catch (error) {
         console.error('加载资讯列表失败:', error);
-        newsData = [];
+        newsData = window.__NEWS_DATA__ || [];
         displayNewsPage(1);
     }
 }
@@ -399,7 +403,7 @@ function createNewsCard(news) {
                 </div>
                 <h3>${news.title}</h3>
                 <p class="news-summary">${news.summary}</p>
-                <a href="#" class="read-more">阅读详情 →</a>
+                <a href="${news.sourceUrl || '#'}" class="read-more" target="_blank">阅读详情 →</a>
             </div>
         </div>
     `;
