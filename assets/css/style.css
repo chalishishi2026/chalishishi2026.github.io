@@ -139,14 +139,14 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 1.4rem;
-    font-weight: bold;
+    font-size: 1.65rem;
+    font-weight: 700;
     color: var(--white);
     text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .logo img {
-    height: 45px;
+    height: 52px;
     width: auto;
     filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
     transition: var(--transition);
