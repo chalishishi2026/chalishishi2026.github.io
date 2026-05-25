@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
 /* ============================================
    肆顾门数字文化 - 时尚新潮风格样式表
    配色：深海蓝 + 香槟金 + 霓虹渐变
@@ -139,7 +140,8 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 1.65rem;
+    font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+        font-size: 1.65rem;
     font-weight: 700;
     color: var(--white);
     text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
