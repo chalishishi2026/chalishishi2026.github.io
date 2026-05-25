@@ -141,7 +141,7 @@ a:hover {
     align-items: center;
     gap: 12px;
     font-family: "Noto Serif SC", "Source Han Serif SC", serif;
-        font-size: 1.65rem;
+    font-size: 1.65rem;
     font-weight: 700;
     color: var(--white);
     text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
